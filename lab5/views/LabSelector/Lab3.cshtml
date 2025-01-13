@@ -1,0 +1,135 @@
+@{
+    ViewData["Title"] = "Lab 3";
+}
+
+<h2>Lab 3</h2>
+
+@if (ViewBag.ErrorMessage != null)
+{
+    <p style="color:red;">@ViewBag.ErrorMessage</p>
+}
+
+@if (ViewBag.SuccessMessage != null)
+{
+    <p style="color:green;">@ViewBag.SuccessMessage</p>
+}
+
+<div>
+    <h3>Варіант 50</h3>
+    <h3>Завдання</h3>
+    <p>
+        Багато видів спортивних змагань мають різні ритуали, створені задля примирення конкуруючих команд чи гравців. Це може бути рукостискання, уклін або навіть розбризкування шампанського.
+        ACM (Alliance of Chess Masters) збирається створити свій власний ритуал, шахову мінігру, в якій бере участь два гравці в союзі один з одним (а не як завжди, один проти одного).
+        Гра проходить на шахівниці розміром 3×3, у кожного з гравців є два шахові коні, яких вони повинні перемістити так, щоб дістатися від однієї позиції до іншої (гравці можуть робити кроки в будь-якому порядку, не обов'язково по черзі).
+        При цьому два коні не можуть займати одну і ту ж клітину. Стартове та завершальне положення визначено суддею. Виявляється, деякі такі завдання є більш важкими, ніж інші, а деякі можуть бути навіть нерозв'язними - тому деякі гравці іноді неспроможні закінчити ритуал.
+        Ваше завдання полягає в тому, щоб написати програму, яка за заданими положеннями початкової та кінцевої розстановки зможе визначити можливість успішного закінчення гри, а у разі успіху зможе так само визначити складність завдання – мінімально можливу кількість ходів, необхідних для вирішення даного завдання.
+    </p>
+    <h4>Вхідні дані</h4>
+    <p>
+        Вхідний файл <b>INPUT.TXT</b> містить 3 рядки по 7 символів у кожному. Перші 3 символи кожного рядка описують відповідний рядок шахового рядка для початкової позиції, потім йде пробіл і замикають 3 символи, що описують аналогічним чином рядок кінцевої позиції.
+        Білий кінь позначається символом <b>"W"</b>, а чорний - символом <b>"B"</b>, порожні клітини позначаються <b>"."</b> (крапка).
+    </p>
+    <h4>Вихідні дані</h4>
+    <p>
+        У вихідний файл <b>OUTPUT.TXT</b> виведіть одне ціле число – складність завдання. Якщо завдання немає рішення, слід вивести <b>-1</b>.
+    </p>
+    <h4>Приклад</h4>
+    <table style="border-collapse: collapse; width: 60%; text-align: left; border: 1px solid #ddd;">
+        <thead>
+            <tr>
+                <th style="border: 1px solid #ddd; padding: 8px;">№</th>
+                <th style="border: 1px solid #ddd; padding: 8px;">INPUT.TXT</th>
+                <th style="border: 1px solid #ddd; padding: 8px;">OUTPUT.TXT</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td style="border: 1px solid #ddd; padding: 8px;">1</td>
+                <td style="border: 1px solid #ddd; padding: 8px; white-space: pre;">WBB ..W<br>W.. ..W<br>W.. .BB</td>
+                <td style="border: 1px solid #ddd; padding: 8px;">4</td>
+            </tr>
+            <tr>
+                <td style="border: 1px solid #ddd; padding: 8px;">2</td>
+                <td style="border: 1px solid #ddd; padding: 8px; white-space: pre;">..B ..B<br>W.B ..B<br>W.. WW.</td>
+                <td style="border: 1px solid #ddd; padding: 8px;">-1</td>
+            </tr>
+        </tbody>
+    </table>
+    <br><br>
+</div>
+
+<form asp-controller="LabSelector" asp-action="RunLab" method="post" enctype="multipart/form-data">
+    <input type="hidden" name="labName" value="Lab3" />
+
+    <label for="inputFile">Select Input File:</label>
+    <input type="file" id="inputFile" name="inputFile" accept=".txt" required />
+    <br />
+    <div>
+        <strong>Input File Content:</strong>
+        <pre id="inputFileContent" style="border: 1px solid #ddd; padding: 10px; max-height: 200px; overflow-y: auto;"></pre>
+    </div>
+    <br />
+
+    <label for="outputFile">Select Output File:</label>
+    <input type="file" id="outputFile" name="outputFile" accept=".txt" required />
+    <br />
+    <div>
+        <strong>Output File Content:</strong>
+        <pre id="outputFileContent" style="border: 1px solid #ddd; padding: 10px; max-height: 200px; overflow-y: auto;"></pre>
+    </div>
+    <br />
+
+    <button type="submit">Run Lab 3</button>
+</form>
+
+@if (ViewBag.InputFileContent != null && ViewBag.OutputFileContent != null)
+{
+    <div>
+        <h3>Input File Content:</h3>
+        <pre>@ViewBag.InputFileContent</pre>
+        <h3>Output File Content:</h3>
+        <pre>@ViewBag.OutputFileContent</pre>
+    </div>
+}
+
+<script>
+    let lastInputFile = null;
+    let lastOutputFile = null;
+
+    function displayFileContent(file, targetId) {
+        const target = document.getElementById(targetId); // Находим целевой элемент для отображения содержимого
+
+        if (file) {
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                target.textContent = e.target.result;
+            };
+
+            reader.readAsText(file);
+        } else {
+            target.textContent = "No file selected.";
+        }
+    }
+
+    // Проверяет изменения в выбранных файлах и обновляет их содержимое в соответствующих элементах.
+    function monitorFileInputs() {
+        const inputFileElement = document.getElementById("inputFile"); // Находим элемент ввода файла для input
+        const outputFileElement = document.getElementById("outputFile"); // Находим элемент ввода файла для output
+
+        // Проверяем, изменился ли выбранный файл ввода
+        if (inputFileElement.files[0] !== lastInputFile) {
+            lastInputFile = inputFileElement.files[0]; // Обновляем ссылку на последний выбранный файл
+            displayFileContent(lastInputFile, "inputFileContent"); // Обновляем содержимое элемента отображения
+        }
+
+        // Проверяем, изменился ли выбранный файл вывода
+        if (outputFileElement.files[0] !== lastOutputFile) {
+            lastOutputFile = outputFileElement.files[0]; // Обновляем ссылку на последний выбранный файл
+            displayFileContent(lastOutputFile, "outputFileContent"); // Обновляем содержимое элемента отображения
+        }
+    }
+
+    // Запускаем мониторинг полей ввода каждые 500 мс
+    setInterval(monitorFileInputs, 500);
+</script>

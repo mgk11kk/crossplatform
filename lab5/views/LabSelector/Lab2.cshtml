@@ -1,0 +1,139 @@
+@{
+    ViewData["Title"] = "Lab 2";
+}
+
+<h2>Lab 2</h2>
+
+@if (ViewBag.ErrorMessage != null)
+{
+    <p style="color:red;">@ViewBag.ErrorMessage</p>
+}
+
+@if (ViewBag.SuccessMessage != null)
+{
+    <p style="color:green;">@ViewBag.SuccessMessage</p>
+}
+
+<div>
+    <h3>Опис завдання</h3>
+    <p>
+        Ігрове поле <b>N×M</b> заповнюється цілими числами, одне невід'ємне ціле число в кожній клітині.
+        Мета гри полягає в тому, щоб пройти будь-яким дозволеним шляхом від верхнього лівого кута до правого нижнього.
+        Ціле число в кожній клітині вказує, який крок має бути довжиною з поточної клітини. Всі кроки можуть бути або
+        праворуч, або вниз. Якщо в результаті будь-якого кроку гравець залишає межі поля, такий крок забороняється.
+    </p>
+    <p>
+        На рисунку наведено приклад ігрового поля 3×4, де суцільне коло показує положення початку, а пунктирне коло – ціль.
+        Малюнок також показує три можливі шляхи від початку до мети для розглянутого прикладу ігрового поля.
+    </p>
+    <img src="/img/Lab2_example.png" alt="Приклад ігрового поля" style="max-width: 100%; height: auto; border: 1px solid #ddd; margin-top: 10px;" />
+    <br><br>
+
+    <h4>Вхідні дані</h4>
+    <p>
+        Вхідний файл <b>INPUT.TXT</b> містить у першому рядку розміри поля <b>N</b> (1 ≤ N ≤ 70) та
+        <b>M</b> (1 ≤ M ≤ 70). У наступних <b>N</b> рядках, кожен з яких описує окремий рядок ігрового поля,
+        записані через пробіл по <b>M</b> цілих чисел від 0 до 100 – довжини кроків із клітин даного рядка.
+    </p>
+
+    <h4>Вихідні дані</h4>
+    <p>
+        Вихідний файл <b>OUTPUT.TXT</b> повинен містити одне число – кількість різних варіантів шляхів від
+        верхнього лівого кута до правого нижнього. Для кожного поля буде менше <b>2³¹</b> різних шляхів.
+    </p>
+
+    <h4>Приклади</h4>
+    <table style="border-collapse: collapse; width: 50%; text-align: left; border: 1px solid #ddd;">
+        <thead>
+            <tr>
+                <th style="border: 1px solid #ddd; padding: 8px;">№</th>
+                <th style="border: 1px solid #ddd; padding: 8px;">INPUT.TXT</th>
+                <th style="border: 1px solid #ddd; padding: 8px;">OUTPUT.TXT</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td style="border: 1px solid #ddd; padding: 8px;">1</td>
+                <td style="border: 1px solid #ddd; padding: 8px;">3 4<br>2 1 1 2<br>3 2 1 44<br>3 1 1 0</td>
+                <td style="border: 1px solid #ddd; padding: 8px;">3</td>
+            </tr>
+        </tbody>
+    </table>
+    <br><br>
+</div>
+
+<form asp-controller="LabSelector" asp-action="RunLab" method="post" enctype="multipart/form-data">
+    <input type="hidden" name="labName" value="Lab2" />
+
+    <label for="inputFile">Select Input File:</label>
+    <input type="file" id="inputFile" name="inputFile" accept=".txt" required />
+    <br />
+    <div>
+        <strong>Input File Content:</strong>
+        <pre id="inputFileContent" style="border: 1px solid #ddd; padding: 10px; max-height: 200px; overflow-y: auto;"></pre>
+    </div>
+    <br />
+
+    <label for="outputFile">Select Output File:</label>
+    <input type="file" id="outputFile" name="outputFile" accept=".txt" required />
+    <br />
+    <div>
+        <strong>Output File Content:</strong>
+        <pre id="outputFileContent" style="border: 1px solid #ddd; padding: 10px; max-height: 200px; overflow-y: auto;"></pre>
+    </div>
+    <br />
+
+    <button type="submit">Run Lab 2</button>
+</form>
+
+@if (ViewBag.InputFileContent != null && ViewBag.OutputFileContent != null)
+{
+    <div>
+        <h3>Input File Content:</h3>
+        <pre>@ViewBag.InputFileContent</pre>
+        <h3>Output File Content:</h3>
+        <pre>@ViewBag.OutputFileContent</pre>
+    </div>
+}
+
+<script>
+    let lastInputFile = null;
+    let lastOutputFile = null;
+
+    function displayFileContent(file, targetId) {
+        const target = document.getElementById(targetId); // Находим целевой элемент для отображения содержимого
+
+        if (file) {
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                target.textContent = e.target.result;
+            };
+
+            reader.readAsText(file);
+        } else {
+            target.textContent = "No file selected.";
+        }
+    }
+
+    // Проверяет изменения в выбранных файлах и обновляет их содержимое в соответствующих элементах.
+    function monitorFileInputs() {
+        const inputFileElement = document.getElementById("inputFile"); // Находим элемент ввода файла для input
+        const outputFileElement = document.getElementById("outputFile"); // Находим элемент ввода файла для output
+
+        // Проверяем, изменился ли выбранный файл ввода
+        if (inputFileElement.files[0] !== lastInputFile) {
+            lastInputFile = inputFileElement.files[0]; // Обновляем ссылку на последний выбранный файл
+            displayFileContent(lastInputFile, "inputFileContent"); // Обновляем содержимое элемента отображения
+        }
+
+        // Проверяем, изменился ли выбранный файл вывода
+        if (outputFileElement.files[0] !== lastOutputFile) {
+            lastOutputFile = outputFileElement.files[0]; // Обновляем ссылку на последний выбранный файл
+            displayFileContent(lastOutputFile, "outputFileContent"); // Обновляем содержимое элемента отображения
+        }
+    }
+
+    // Запускаем мониторинг полей ввода каждые 500 мс
+    setInterval(monitorFileInputs, 500);
+</script>
