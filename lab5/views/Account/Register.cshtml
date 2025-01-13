@@ -1,0 +1,70 @@
+@model Lab5.Models.AccountModel
+
+@{
+    ViewData["Title"] = "Register";
+}
+
+<h2 class="text-center">Register</h2>
+
+<!-- CSRF защита -->
+@Html.AntiForgeryToken()
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <form method="post" asp-controller="Account" asp-action="Register">
+                <div class="mb-3">
+                    <label for="username" class="form-label">Username (max 50):</label>
+                    <input type="text" id="username" asp-for="Username" class="form-control" maxlength="50" required />
+                    <span asp-validation-for="Username" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label for="fullname" class="form-label">Full Name (max 500):</label>
+                    <input type="text" id="fullname" asp-for="FullName" class="form-control" maxlength="500" required />
+                    <span asp-validation-for="FullName" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password (8-16 chars):</label>
+                    <input type="password" id="password" asp-for="Password" class="form-control" required />
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label for="confirmPassword" class="form-label">Confirm Password:</label>
+                    <input type="password" id="confirmPassword" asp-for="ConfirmPassword" class="form-control" required />
+                    <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label for="phone" class="form-label">Phone (UA format):</label>
+                    <input type="text" id="phone" asp-for="PhoneNumber" class="form-control" required />
+                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email:</label>
+                    <input type="email" id="email" asp-for="Email" class="form-control" required />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+
+                <!-- Отображение ошибки, если регистрация провалилась -->
+                @if (ViewBag.ErrorMessage != null)
+                {
+                    <div class="alert alert-danger">
+                        @ViewBag.ErrorMessage
+                    </div>
+                }
+
+                <button type="submit" class="btn btn-primary w-100">Register</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
