@@ -1,0 +1,24 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+
+		<NoWarn>CS8603;CS8625;NU1903</NoWarn>
+	</PropertyGroup>
+
+	<Target Name="Build">
+		<Message Text="Building $(Solution)" Importance="high" />
+		<Exec Command="dotnet build $(Solution)/$(Solution)/$(Solution).csproj" />
+	</Target>
+
+	<Target Name="Run">
+		<Message Text="Running $(Solution)" Importance="high" />
+		<Exec Command="dotnet run --project $(Solution)/$(Solution)/$(Solution).csproj" />
+	</Target>
+
+	<Target Name="Test">
+		<Message Text="Running tests for $(Solution)" Importance="high" />
+		<Exec Command="dotnet test $(Solution)/$(Solution).xUnitTests/$(Solution).xUnitTests.csproj" />
+	</Target>
+
+</Project>
