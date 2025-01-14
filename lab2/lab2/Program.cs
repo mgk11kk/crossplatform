@@ -1,25 +1,25 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Runtime.CompilerServices;
 
-// Видимость для тестов
+// Дозволяємо видимість для тестових проектів
 [assembly: InternalsVisibleTo("Lab2.xUnitTests")]
 
 namespace Lab2
 {
     public class Program
     {
-        // Максимальные размеры поля
+        // Максимальні розміри поля
         const int ROWS_TOTAL_MAX = 70;
         const int COLS_TOTAL_MAX = 70;
 
-        // Игровое поле и таблица для подсчета вариантов
-        internal static int[,] field = new int[ROWS_TOTAL_MAX, COLS_TOTAL_MAX]; // internal свойство для тестов
+        // Ігрове поле та таблиця для підрахунку варіантів
+        internal static int[,] field = new int[ROWS_TOTAL_MAX, COLS_TOTAL_MAX]; // Внутрішнє поле для тестів
         static long[,] variantsCounter = new long[ROWS_TOTAL_MAX, COLS_TOTAL_MAX];
 
         public static void Main(string[] args)
         {
-            // Определение путей для входного и выходного файлов
+            // Визначення шляхів для вхідного та вихідного файлів
             string rootDirectory = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, @"..\..\.."));
             string inputPath = Path.Combine(rootDirectory, "INPUT.TXT");
             string outputPath = Path.Combine(rootDirectory, "OUTPUT.TXT");
@@ -31,25 +31,25 @@ namespace Lab2
         {
             try
             {
-                // Чтение данных из входного файла
+                // Читання даних з вхідного файлу
                 string[] inputData = File.ReadAllLines(inputPath);
 
-                // Проверка и чтение размеров поля
+                // Перевірка та читання розмірів поля
                 if (!ValidateDimensions(inputData[0], out int rowsTotal, out int colsTotal))
                 {
                     throw new Exception("Invalid field dimensions in the first line.");
                 }
 
-                // Проверка и заполнение игрового поля
+                // Перевірка та заповнення ігрового поля
                 if (!ValidateAndFillField(inputData, rowsTotal, colsTotal))
                 {
                     throw new Exception("Invalid data in the game field.");
                 }
 
-                // Получение количества вариантов путей
+                // Отримання кількості варіантів шляхів
                 long result = GetVariantsCount(rowsTotal, colsTotal);
 
-                // Запись результата в выходной файл
+                // Запис результату у вихідний файл
                 File.WriteAllText(outputPath, result.ToString());
 
                 Console.WriteLine($"The number of possible paths: {result}");
@@ -60,14 +60,14 @@ namespace Lab2
             }
         }
 
-        // Метод проверки и чтения размеров поля
+        // Метод для перевірки та читання розмірів поля
         public static bool ValidateDimensions(string firstLine, out int rowsTotal, out int colsTotal)
         {
             rowsTotal = 0;
             colsTotal = 0;
             string[] dimensions = firstLine.Split(' ');
 
-            // Проверка, что в первой строке два числа
+            // Перевірка, що в першому рядку два числа
             if (dimensions.Length != 2 ||
                 !int.TryParse(dimensions[0], out rowsTotal) ||
                 !int.TryParse(dimensions[1], out colsTotal))
@@ -76,7 +76,7 @@ namespace Lab2
                 return false;
             }
 
-            // Проверка, что размеры находятся в пределах 1 ≤ N, M ≤ 70
+            // Перевірка, що розміри знаходяться в межах 1 ≤ N, M ≤ 70
             if (rowsTotal < 1 || rowsTotal > 70 || colsTotal < 1 || colsTotal > 70)
             {
                 Console.WriteLine("Error: The dimensions must be between 1 and 70.");
@@ -86,22 +86,22 @@ namespace Lab2
             return true;
         }
 
-        // Метод проверки данных игрового поля и заполнения массива field
+        // Метод для перевірки даних ігрового поля та заповнення масиву field
         public static bool ValidateAndFillField(string[] inputData, int rowsTotal, int colsTotal)
         {
-            // Проверка количества строк
+            // Перевірка кількості рядків
             if (inputData.Length - 1 != rowsTotal)
             {
                 Console.WriteLine("Error: The number of rows in the input data does not match the specified dimensions.");
                 return false;
             }
 
-            // Заполнение поля
+            // Заповнення поля
             for (int i = 0; i < rowsTotal; i++)
             {
                 string[] rowData = inputData[i + 1].Split(' ');
 
-                // Проверка количества элементов в строке
+                // Перевірка кількості елементів у рядку
                 if (rowData.Length != colsTotal)
                 {
                     Console.WriteLine($"Error: Row {i + 1} does not contain the correct number of columns.");
@@ -110,7 +110,7 @@ namespace Lab2
 
                 for (int j = 0; j < colsTotal; j++)
                 {
-                    // Проверка, что каждый элемент — неотрицательное целое число от 0 до 100
+                    // Перевірка, що кожен елемент — невід'ємне ціле число від 0 до 100
                     if (!int.TryParse(rowData[j], out int cellValue) || cellValue < 0 || cellValue > 100)
                     {
                         Console.WriteLine($"Error: Invalid value '{rowData[j]}' at position ({i + 1}, {j + 1}). It must be between 0 and 100.");
@@ -124,30 +124,30 @@ namespace Lab2
             return true;
         }
 
-        // Метод проверки возможности шага вправо
+        // Метод перевірки можливості кроку вправо
         public static bool MayGoToRight(int stepsCount, int colsTotal, int col)
         {
             return col + stepsCount < colsTotal;
         }
 
-        // Метод проверки возможности шага вниз
+        // Метод перевірки можливості кроку вниз
         public static bool MayGoToDown(int stepsCount, int rowsTotal, int row)
         {
             return row + stepsCount < rowsTotal;
         }
 
-        // Метод для подсчета количества вариантов путей
+        // Метод для підрахунку кількості варіантів шляхів
         public static long GetVariantsCount(int rowsTotal, int colsTotal)
         {
-            // Устанавливаем начальное количество путей из стартовой точки
+            // Встановлюємо початкову кількість шляхів зі стартової точки
             variantsCounter[0, 0] = 1;
 
-            // Перебираем все клетки игрового поля
+            // Перебираємо всі клітинки ігрового поля
             for (int i = 0; i < rowsTotal; i++)
             {
                 for (int j = 0; j < colsTotal; j++)
                 {
-                    // Если нет путей в текущую клетку или шаг равен 0, пропускаем её
+                    // Якщо немає шляхів у поточну клітинку або крок дорівнює 0, пропускаємо її
                     if (variantsCounter[i, j] == 0 || field[i, j] == 0)
                     {
                         continue;
@@ -155,13 +155,13 @@ namespace Lab2
 
                     int stepsCount = field[i, j];
 
-                    // Проверяем возможность шага вправо
+                    // Перевірка можливості кроку вправо
                     if (MayGoToRight(stepsCount, colsTotal, j))
                     {
                         variantsCounter[i, j + stepsCount] += variantsCounter[i, j];
                     }
 
-                    // Проверяем возможность шага вниз
+                    // Перевірка можливості кроку вниз
                     if (MayGoToDown(stepsCount, rowsTotal, i))
                     {
                         variantsCounter[i + stepsCount, j] += variantsCounter[i, j];
@@ -169,7 +169,7 @@ namespace Lab2
                 }
             }
 
-            // Возвращаем количество вариантов путей до правого нижнего угла
+            // Повертаємо кількість варіантів шляхів до правого нижнього кута
             return variantsCounter[rowsTotal - 1, colsTotal - 1];
         }
     }
